@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?><bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Web Modeler" exporterVersion="d9f6ce8" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.0.0" camunda:diagramRelationId="34b2cc18-df16-438d-a747-4d5f1dcf92c4">
+  <bpmn:process id="Process_3d0c5c07-468e-4a26-8f44-808c4f81b276" name="clone-completed" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_19iadez</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_19iadez" sourceRef="StartEvent_1" targetRef="Activity_0u7116k"/>
+    <bpmn:serviceTask id="Activity_0u7116k" name="async-clone">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="async-clone-config"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_19iadez</bpmn:incoming>
+      <bpmn:outgoing>Flow_1iawryq</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_1sxalu5" name="clone-succeeded">
+      <bpmn:incoming>Flow_04m9crg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:intermediateCatchEvent id="Event_1f3y06n" name="poins-clone-completed">
+      <bpmn:incoming>Flow_1v9aiza</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wj538e</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1na1lmb" messageRef="Message_2rdo048"/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Activity_08d32kq" name="async-send-success-email">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="async-send-success-email"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0s7xn9o</bpmn:incoming>
+      <bpmn:outgoing>Flow_04m9crg</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_04m9crg" sourceRef="Activity_08d32kq" targetRef="Event_1sxalu5"/>
+    <bpmn:serviceTask id="Activity_0d6exrs" name="async-clone-points">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="async-clone-points"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1iawryq</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qw6r6z</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1iawryq" sourceRef="Activity_0u7116k" targetRef="Activity_0d6exrs"/>
+    <bpmn:sequenceFlow id="Flow_0wj538e" sourceRef="Event_1f3y06n" targetRef="Activity_038ehbk"/>
+    <bpmn:intermediateCatchEvent id="Event_0ll2hgp" name="points-clone-failed">
+      <bpmn:incoming>Flow_103qphs</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vp3ub0</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0th1hlb" messageRef="Message_25rn6fh"/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="Event_1wwu0uw" name="clone-failed">
+      <bpmn:incoming>Flow_1hnzgeu</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_103qphs" sourceRef="Gateway_0vv57ln" targetRef="Event_0ll2hgp"/>
+    <bpmn:sequenceFlow id="Flow_0vp3ub0" sourceRef="Event_0ll2hgp" targetRef="Activity_0i962d3"/>
+    <bpmn:serviceTask id="Activity_0i962d3" name="async-send-failure-email">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="async-send-failure-email"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0vp3ub0</bpmn:incoming>
+      <bpmn:incoming>Flow_01qya6a</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hnzgeu</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1hnzgeu" sourceRef="Activity_0i962d3" targetRef="Event_1wwu0uw"/>
+    <bpmn:eventBasedGateway id="Gateway_0vv57ln">
+      <bpmn:incoming>Flow_0qw6r6z</bpmn:incoming>
+      <bpmn:outgoing>Flow_103qphs</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1v9aiza</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:sequenceFlow id="Flow_1v9aiza" sourceRef="Gateway_0vv57ln" targetRef="Event_1f3y06n"/>
+    <bpmn:sequenceFlow id="Flow_0qw6r6z" sourceRef="Activity_0d6exrs" targetRef="Gateway_0vv57ln"/>
+    <bpmn:serviceTask id="Activity_038ehbk" name="async-clone-rewards">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="async-clone-rewards"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0wj538e</bpmn:incoming>
+      <bpmn:outgoing>Flow_1olqlyc</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:eventBasedGateway id="Gateway_1gxl9xg">
+      <bpmn:incoming>Flow_1olqlyc</bpmn:incoming>
+      <bpmn:outgoing>Flow_189gxt4</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0724oy4</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:sequenceFlow id="Flow_1olqlyc" sourceRef="Activity_038ehbk" targetRef="Gateway_1gxl9xg"/>
+    <bpmn:intermediateCatchEvent id="Event_17tskw0" name="rewrds-clone-completed">
+      <bpmn:incoming>Flow_189gxt4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0s7xn9o</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0beax9w" messageRef="Message_19ec9uc"/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_189gxt4" sourceRef="Gateway_1gxl9xg" targetRef="Event_17tskw0"/>
+    <bpmn:intermediateCatchEvent id="Event_0aawtjw" name="rewards-clone-failed">
+      <bpmn:incoming>Flow_0724oy4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xbv05h</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0aenph8" messageRef="Message_14d8ub3"/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_0724oy4" sourceRef="Gateway_1gxl9xg" targetRef="Event_0aawtjw"/>
+    <bpmn:sequenceFlow id="Flow_1xbv05h" sourceRef="Event_0aawtjw" targetRef="Activity_18zihwg"/>
+    <bpmn:intermediateCatchEvent id="Event_1nrn2bc" name="points-revert-completed">
+      <bpmn:incoming>Flow_16mfx02</bpmn:incoming>
+      <bpmn:outgoing>Flow_01qya6a</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1hi36q0" messageRef="Message_2r76ghr"/>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_16mfx02" sourceRef="Activity_18zihwg" targetRef="Event_1nrn2bc"/>
+    <bpmn:sequenceFlow id="Flow_01qya6a" sourceRef="Event_1nrn2bc" targetRef="Activity_0i962d3"/>
+    <bpmn:sequenceFlow id="Flow_0s7xn9o" sourceRef="Event_17tskw0" targetRef="Activity_08d32kq"/>
+    <bpmn:serviceTask id="Activity_18zihwg" name="async-revert-points">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="async-revert-points"/>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1xbv05h</bpmn:incoming>
+      <bpmn:outgoing>Flow_16mfx02</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:message id="Message_0c7925l" name="CloneCompleted">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="= async-clone-points-completed"/>
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_2rdo048" name="PointsCloneCompleted">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="= ClonePointsCompletedCorrelationKey"/>
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_25rn6fh" name="PointsCloneFailed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="= ClonePointsFailedCorrelationKey"/>
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_19ec9uc" name="RewardsCloneCompleted">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="= CloneRewardsCompletedCorrelationKey"/>
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_2r76ghr" name="PointsRevertCompleted">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="= RevertPointsCompletedCorrelationKey"/>
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_14d8ub3" name="RewardsCloneFailed">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="= CloneRewardsFailedCorrelationKey"/>
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_3d0c5c07-468e-4a26-8f44-808c4f81b276">
+      <bpmndi:BPMNEdge id="Flow_0s7xn9o_di" bpmnElement="Flow_0s7xn9o">
+        <di:waypoint x="1028" y="118"/>
+        <di:waypoint x="1110" y="118"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01qya6a_di" bpmnElement="Flow_01qya6a">
+        <di:waypoint x="532" y="310"/>
+        <di:waypoint x="476" y="310"/>
+        <di:waypoint x="476" y="290"/>
+        <di:waypoint x="420" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16mfx02_di" bpmnElement="Flow_16mfx02">
+        <di:waypoint x="770" y="310"/>
+        <di:waypoint x="568" y="310"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xbv05h_di" bpmnElement="Flow_1xbv05h">
+        <di:waypoint x="912" y="260"/>
+        <di:waypoint x="891" y="260"/>
+        <di:waypoint x="891" y="310"/>
+        <di:waypoint x="870" y="310"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0724oy4_di" bpmnElement="Flow_0724oy4">
+        <di:waypoint x="930" y="143"/>
+        <di:waypoint x="930" y="242"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_189gxt4_di" bpmnElement="Flow_189gxt4">
+        <di:waypoint x="955" y="118"/>
+        <di:waypoint x="992" y="118"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1olqlyc_di" bpmnElement="Flow_1olqlyc">
+        <di:waypoint x="870" y="118"/>
+        <di:waypoint x="905" y="118"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qw6r6z_di" bpmnElement="Flow_0qw6r6z">
+        <di:waypoint x="560" y="118"/>
+        <di:waypoint x="615" y="118"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1v9aiza_di" bpmnElement="Flow_1v9aiza">
+        <di:waypoint x="665" y="118"/>
+        <di:waypoint x="702" y="118"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hnzgeu_di" bpmnElement="Flow_1hnzgeu">
+        <di:waypoint x="320" y="270"/>
+        <di:waypoint x="259" y="270"/>
+        <di:waypoint x="259" y="260"/>
+        <di:waypoint x="198" y="260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vp3ub0_di" bpmnElement="Flow_0vp3ub0">
+        <di:waypoint x="532" y="220"/>
+        <di:waypoint x="476" y="220"/>
+        <di:waypoint x="476" y="270"/>
+        <di:waypoint x="420" y="270"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_103qphs_di" bpmnElement="Flow_103qphs">
+        <di:waypoint x="640" y="143"/>
+        <di:waypoint x="640" y="220"/>
+        <di:waypoint x="568" y="220"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wj538e_di" bpmnElement="Flow_0wj538e">
+        <di:waypoint x="738" y="118"/>
+        <di:waypoint x="770" y="118"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1iawryq_di" bpmnElement="Flow_1iawryq">
+        <di:waypoint x="420" y="120"/>
+        <di:waypoint x="440" y="120"/>
+        <di:waypoint x="440" y="118"/>
+        <di:waypoint x="460" y="118"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04m9crg_di" bpmnElement="Flow_04m9crg">
+        <di:waypoint x="1210" y="118"/>
+        <di:waypoint x="1312" y="118"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19iadez_di" bpmnElement="Flow_19iadez">
+        <di:waypoint x="186" y="118"/>
+        <di:waypoint x="253" y="118"/>
+        <di:waypoint x="253" y="120"/>
+        <di:waypoint x="320" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="150" y="100" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0tjixmk_di" bpmnElement="Activity_0u7116k">
+        <dc:Bounds x="320" y="80" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1sxalu5_di" bpmnElement="Event_1sxalu5">
+        <dc:Bounds x="1312" y="100" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1290" y="143" width="84" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1y0faix_di" bpmnElement="Event_1f3y06n">
+        <dc:Bounds x="702" y="100" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="692" y="143" width="60" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nmb6ya_di" bpmnElement="Activity_08d32kq">
+        <dc:Bounds x="1110" y="78" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03n122x_di" bpmnElement="Activity_0d6exrs">
+        <dc:Bounds x="460" y="78" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1trb8iy_di" bpmnElement="Event_0ll2hgp">
+        <dc:Bounds x="532" y="202" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="506" y="245" width="90" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1wwu0uw_di" bpmnElement="Event_1wwu0uw">
+        <dc:Bounds x="162" y="242" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="152" y="285" width="57" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0z3rmiw_di" bpmnElement="Activity_0i962d3">
+        <dc:Bounds x="320" y="230" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1laaqv0_di" bpmnElement="Gateway_0vv57ln">
+        <dc:Bounds x="615" y="93" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ah5y67_di" bpmnElement="Activity_038ehbk">
+        <dc:Bounds x="770" y="78" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0hvq8c0_di" bpmnElement="Gateway_1gxl9xg">
+        <dc:Bounds x="905" y="93" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_09kk0fl_di" bpmnElement="Event_17tskw0">
+        <dc:Bounds x="992" y="100" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="979" y="143" width="67" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0ytge7d" bpmnElement="Event_0aawtjw">
+        <dc:Bounds x="912" y="242" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="894" y="285" width="73" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0tyfmzx_di" bpmnElement="Event_1nrn2bc">
+        <dc:Bounds x="532" y="292" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="520" y="335" width="65" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_126kow2_di" bpmnElement="Activity_18zihwg">
+        <dc:Bounds x="770" y="270" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
