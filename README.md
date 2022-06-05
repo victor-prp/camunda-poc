@@ -43,6 +43,11 @@ How to run:
 - Start Instance (without parameters)
 - Set proper zeebe.client.cloud.clientSecret in [application.properties](src/main/resources/application.properties)
 - Run [CloneConfigAsync](src/main/java/victor/prp/cammunda/poc/async/CloneConfigAsync.java) using your IDE or maven
+<p>
+NOTE: In order to force rewards step fair Start the Instance with the following variables:
+{
+    "fail-rewards":"true"
+}
 
 
 ## Redeem Points Sync
@@ -59,6 +64,12 @@ NOTES:
 
 How to run:
 - Deploy the [redeem-points-sync.bpmn](src/main/resources/processes/redeem-points-sync.bpmn) to camunda cloud modeler
-- Start Instance (without parameters)
 - Set proper zeebe.client.cloud.clientSecret in [application.properties](src/main/resources/application.properties)
 - Run [CloneConfigAsync](src/main/java/victor/prp/cammunda/poc/sync) using your IDE or maven
+- Use postman and call POST http://localhost:8084/redeem-points {}
+
+<p>
+NOTE: In order to force rewards step fail, add the following body when calling the REST:
+{
+    "fail-rewards":"true"
+}

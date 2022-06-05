@@ -31,10 +31,11 @@ public class RestController {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    Mono<ResponseEntity<ProcessInstanceEvent>> create(@RequestBody(required = false) Map<String,String> inputParams){
+    Mono<ResponseEntity<ProcessInstanceEvent>> create(@RequestBody(required = false) String inputParams){
         Future<ProcessInstanceEvent> future = zeebeClient.newCreateInstanceCommand()
             .bpmnProcessId("Process_16f5e059-fa88-441c-968b-cd0b5834233e")
             .latestVersion()
+            .variables(inputParams)
             .send();
 
         return ReactiveUtil.toMono(future)
