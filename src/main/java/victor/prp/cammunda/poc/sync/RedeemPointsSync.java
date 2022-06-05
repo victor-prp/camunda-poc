@@ -1,9 +1,11 @@
 package victor.prp.cammunda.poc.sync;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.spring.client.exception.ZeebeBpmnError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,42 +15,77 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import io.camunda.zeebe.client.api.response.ActivatedJob;
 import io.camunda.zeebe.spring.client.EnableZeebeClient;
 import io.camunda.zeebe.spring.client.annotation.ZeebeWorker;
+import reactor.core.publisher.Mono;
+import victor.prp.cammunda.poc.util.ZeebeReactiveOperations;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackageClasses = {RedeemPointsSync.class,ZeebeReactiveOperations.class})
 @EnableZeebeClient
 public class RedeemPointsSync {
     private static final Logger log = LoggerFactory.getLogger(RedeemPointsSync.class);
 
+    private final ZeebeClient zeebeClient;
 
-    public static void main(String[] args) {
-    SpringApplication.run(RedeemPointsSync.class, args);
-  }
-  
-  @ZeebeWorker(type = "start-redeem-points", autoComplete = true)
-  public void redeem(final ActivatedJob job) {
+    private final ZeebeReactiveOperations zeebe;
 
-      // Do the business logic
-      log.info("Starting: redeem-points" + job.getVariables());
-  }
-
-    @ZeebeWorker(type = "subtract-points", autoComplete = true)
-    public void subtractPoints(final ActivatedJob job) {
-
-        // Do the business logic
-        log.info("Completed: subtract-points" + job.getVariables());
+    public RedeemPointsSync(ZeebeClient zeebeClient, ZeebeReactiveOperations zeebe) {
+        this.zeebeClient = zeebeClient;
+        this.zeebe = zeebe;
     }
 
-    @ZeebeWorker(type = "create-reward", autoComplete = true)
-    public Map<String, Object> createReward(final ActivatedJob job) {
 
-        if (job.getVariablesAsMap().containsKey("fail-rewards")){
-            log.info("Failed: create-reward");
-            throw new ZeebeBpmnError("1","Reward cannot be created");
+    public static void main(String[] args) {
+        SpringApplication.run(RedeemPointsSync.class, args);
+    }
+
+    @ZeebeWorker(type = "start-redeem-points", autoComplete = false)
+    public void redeem(final ActivatedJob job) {
+
+        zeebe.doAsync(job,
+            simulateCreateRedemptionStateInDB());//Asynchronous invocation using reactive programming
+        log.info("Starting: redeem-points");
+    }
+
+    private Mono<String> simulateCreateRedemptionStateInDB() {
+        return Mono.delay(Duration.ofSeconds(5))
+            .map(number -> UUID.randomUUID().toString())
+            .doOnSuccess(id -> log.info("Redemption state is created in DB, id: {}", id));
+    }
+
+    @ZeebeWorker(type = "subtract-points", autoComplete = false)
+    public void subtractPoints(final ActivatedJob job) {
+
+        zeebe.doAsync(job,
+            simulateRestCallToSubtractPoints());//Asynchronous invocation using reactive programming
+        log.info("Starting: subtract-points" + job.getVariables());
+    }
+
+    private Mono<String> simulateRestCallToSubtractPoints() {
+        return Mono.delay(Duration.ofSeconds(5))
+            .map(number -> UUID.randomUUID().toString())
+            .doOnSuccess(id -> log.info("Points are subtracted, transactionId: {}", id));
+    }
+
+    @ZeebeWorker(type = "create-reward", autoComplete = false)
+    public void createReward(final ActivatedJob job) {
+
+
+        boolean fail = job.getVariablesAsMap().containsKey("fail-rewards");
+        zeebe.doAsyncWithVars(job, simulateRestCallToCreateRewards(fail)
+        );
+        log.info("Starting: create-reward" + job.getVariables());
+
+    }
+
+    private Mono<Map<String, Object>> simulateRestCallToCreateRewards(boolean fail) {
+        if (fail) {
+            return Mono.error(new ZeebeBpmnError("1", "Reward cannot be created"));
         }
-
-        String rewardId = UUID.randomUUID().toString();
-        log.info("Completed: create-reward, id: {}", rewardId);
-        return Collections.singletonMap("rewardId", rewardId);
+        return Mono.delay(Duration.ofSeconds(5))
+            .map(number -> {
+                String rewardId = UUID.randomUUID().toString();
+                log.info("Completed: create-reward, id: {}", rewardId);
+                return Collections.singletonMap("rewardId", rewardId);
+            });
     }
 
 
