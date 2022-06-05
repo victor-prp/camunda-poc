@@ -1,78 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?><bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Web Modeler" exporterVersion="d9f6ce8" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.0.0" camunda:diagramRelationId="7c6fe258-1fd2-41d7-b146-7b0bd997eb9c">
-  <bpmn:process id="Process_16f5e059-fa88-441c-968b-cd0b5834233e" name="sync-clone-revert-email" isExecutable="true">
+  <bpmn:process id="Process_16f5e059-fa88-441c-968b-cd0b5834233e" name="redeem-points-sync" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_1ek2s4g</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_1ek2s4g" name="clone" sourceRef="StartEvent_1" targetRef="Activity_0i5iqes"/>
-    <bpmn:endEvent id="Event_0up00m4" name="CloneCompleted">
+    <bpmn:endEvent id="Event_0up00m4" name="completed">
       <bpmn:incoming>Flow_1fjiq2a</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:serviceTask id="Activity_0i5iqes" name="TenantConfOrch">
+    <bpmn:serviceTask id="Activity_0i5iqes" name="start-redeem-points">
       <bpmn:extensionElements>
-        <zeebe:taskDefinition type="clone-config" retries="2"/>
+        <zeebe:taskDefinition type="start-redeem-points" retries="2"/>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1ek2s4g</bpmn:incoming>
       <bpmn:outgoing>Flow_07z88ko</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_1ifgqrl" name="ClonePoints">
+    <bpmn:serviceTask id="Activity_1ifgqrl" name="subtract-points">
       <bpmn:extensionElements>
-        <zeebe:taskDefinition type="clone-points"/>
+        <zeebe:taskDefinition type="subtract-points"/>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_07z88ko</bpmn:incoming>
       <bpmn:outgoing>Flow_1mp7qxg</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_0mdzwu1" name="CloneRewards">
+    <bpmn:serviceTask id="Activity_0mdzwu1" name="create-reward">
       <bpmn:extensionElements>
-        <zeebe:taskDefinition type="clone-rewards" retries="3"/>
+        <zeebe:taskDefinition type="create-reward" retries="3"/>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1mp7qxg</bpmn:incoming>
       <bpmn:outgoing>Flow_0h5hrnh</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:endEvent id="Event_18wtn46" name="CloneFailed">
+    <bpmn:endEvent id="Event_18wtn46" name="failed">
       <bpmn:incoming>Flow_1fzkdjl</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:serviceTask id="Activity_1kj85ez" name="Revert CloneReward">
-      <bpmn:extensionElements>
-        <zeebe:taskDefinition type="revert-clone-rewards"/>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_122xey4</bpmn:incoming>
-      <bpmn:outgoing>Flow_12zm1e6</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:boundaryEvent id="Event_0bbfc5l" attachedToRef="Activity_0mdzwu1">
       <bpmn:outgoing>Flow_122xey4</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1vgk16h" errorRef="Error_1cxuw81"/>
     </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="Flow_122xey4" sourceRef="Event_0bbfc5l" targetRef="Activity_1kj85ez"/>
+    <bpmn:sequenceFlow id="Flow_122xey4" sourceRef="Event_0bbfc5l" targetRef="Activity_0ksjcj5"/>
     <bpmn:sequenceFlow id="Flow_07z88ko" sourceRef="Activity_0i5iqes" targetRef="Activity_1ifgqrl"/>
     <bpmn:sequenceFlow id="Flow_1mp7qxg" sourceRef="Activity_1ifgqrl" targetRef="Activity_0mdzwu1"/>
-    <bpmn:serviceTask id="Activity_0ksjcj5" name="Revert ClonePoins">
+    <bpmn:serviceTask id="Activity_0ksjcj5" name="add-points">
       <bpmn:extensionElements>
-        <zeebe:taskDefinition type="revert-clone-points"/>
+        <zeebe:taskDefinition type="add-points"/>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_155goak</bpmn:incoming>
-      <bpmn:incoming>Flow_12zm1e6</bpmn:incoming>
+      <bpmn:incoming>Flow_122xey4</bpmn:incoming>
       <bpmn:outgoing>Flow_1gj605t</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_155goak" sourceRef="Event_09ybeyx" targetRef="Activity_0ksjcj5"/>
+    <bpmn:sequenceFlow id="Flow_155goak" sourceRef="Event_09ybeyx" targetRef="Activity_1j41224"/>
     <bpmn:boundaryEvent id="Event_09ybeyx" attachedToRef="Activity_1ifgqrl">
       <bpmn:outgoing>Flow_155goak</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_14unemi" errorRef="Error_12nbfrg"/>
     </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="Flow_12zm1e6" sourceRef="Activity_1kj85ez" targetRef="Activity_0ksjcj5"/>
     <bpmn:sequenceFlow id="Flow_0h5hrnh" sourceRef="Activity_0mdzwu1" targetRef="Activity_1oftao3"/>
     <bpmn:sequenceFlow id="Flow_1fjiq2a" sourceRef="Activity_1oftao3" targetRef="Event_0up00m4"/>
-    <bpmn:serviceTask id="Activity_1oftao3" name="Send Success Email">
+    <bpmn:serviceTask id="Activity_1oftao3" name="complete-redeem-points">
       <bpmn:extensionElements>
-        <zeebe:taskDefinition type="send-success-email"/>
+        <zeebe:taskDefinition type="complete-redeem-points"/>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0h5hrnh</bpmn:incoming>
       <bpmn:outgoing>Flow_1fjiq2a</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_1j41224" name="Send Failure Email">
+    <bpmn:serviceTask id="Activity_1j41224" name="fail-redeem-points">
       <bpmn:extensionElements>
-        <zeebe:taskDefinition type="send-failure-email"/>
+        <zeebe:taskDefinition type="fail-redeem-points"/>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1gj605t</bpmn:incoming>
+      <bpmn:incoming>Flow_155goak</bpmn:incoming>
       <bpmn:outgoing>Flow_1fzkdjl</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1gj605t" sourceRef="Activity_0ksjcj5" targetRef="Activity_1j41224"/>
@@ -100,15 +92,11 @@
         <di:waypoint x="860" y="118"/>
         <di:waypoint x="970" y="118"/>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_12zm1e6_di" bpmnElement="Flow_12zm1e6">
-        <di:waypoint x="760" y="390"/>
-        <di:waypoint x="670" y="390"/>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_155goak_di" bpmnElement="Flow_155goak">
         <di:waypoint x="610" y="176"/>
         <di:waypoint x="610" y="263"/>
-        <di:waypoint x="620" y="263"/>
-        <di:waypoint x="620" y="350"/>
+        <di:waypoint x="420" y="263"/>
+        <di:waypoint x="420" y="350"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1mp7qxg_di" bpmnElement="Flow_1mp7qxg">
         <di:waypoint x="660" y="118"/>
@@ -120,7 +108,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_122xey4_di" bpmnElement="Flow_122xey4">
         <di:waypoint x="810" y="176"/>
-        <di:waypoint x="810" y="350"/>
+        <di:waypoint x="810" y="390"/>
+        <di:waypoint x="670" y="390"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1ek2s4g_di" bpmnElement="Flow_1ek2s4g">
         <di:waypoint x="196" y="118"/>
@@ -135,11 +124,12 @@
       <bpmndi:BPMNShape id="Event_0up00m4_di" bpmnElement="Event_0up00m4">
         <dc:Bounds x="1182" y="100" width="36" height="36"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1160" y="143" width="82" height="14"/>
+          <dc:Bounds x="1176" y="143" width="51" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1olkjt6_di" bpmnElement="Activity_0i5iqes">
         <dc:Bounds x="370" y="78" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1qjdtc6_di" bpmnElement="Activity_1ifgqrl">
         <dc:Bounds x="560" y="78" width="100" height="80"/>
@@ -152,11 +142,8 @@
       <bpmndi:BPMNShape id="Event_18wtn46_di" bpmnElement="Event_18wtn46">
         <dc:Bounds x="172" y="362" width="36" height="36"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="161" y="405" width="59" height="14"/>
+          <dc:Bounds x="177" y="405" width="27" height="14"/>
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_07hauab_di" bpmnElement="Activity_1kj85ez">
-        <dc:Bounds x="760" y="350" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_101kp5j" bpmnElement="Activity_0ksjcj5">
         <dc:Bounds x="570" y="350" width="100" height="80"/>
@@ -164,6 +151,7 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1fa202e_di" bpmnElement="Activity_1oftao3">
         <dc:Bounds x="970" y="78" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1op8pdf_di" bpmnElement="Activity_1j41224">
         <dc:Bounds x="370" y="350" width="100" height="80"/>

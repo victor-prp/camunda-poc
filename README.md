@@ -16,8 +16,8 @@ How to run:
 
 Now you need to  deploy BPMN files (under resources/processes) to camunda modeler.
 
-## BatchItems
-Demonstrates batch job.
+## Batch Items
+Demonstrates batch job.  <p>
 
 ![batch flow](batch.png)
 
@@ -26,8 +26,39 @@ Demonstrates batch job.
 once all items are processed 'notify-done' tasks prints the number of total items count.
 
 How to run:
-- Deploy the [batch.bpmn](src/main/resources/processes/batch.bpmn) to camunda cloud modeler
+- Deploy the [batch.bpmn](src/main/resources/processes/batch-items.bpmn) to camunda cloud modeler
 - Start Instance with json variable: {"count":100}
 - Set proper zeebe.client.cloud.clientSecret in [application.properties](src/main/resources/application.properties)
 - Run [BatchItems](src/main/java/victor/prp/cammunda/poc/batch/BatchItems.java) using your IDE or maven
 
+## Clone Config Async
+Demonstrates classic SAGA with compensation operations.  <p>
+![clone config flow](clone-config-async.png)
+Each participant (points and rewards services) asynchronously perform clone operation and notify when done.
+Finally, success or failure email is sent.
+In case of any failure corresponding compensations are executed.
+
+How to run:
+- Deploy the [clone-config-async.bpmn](src/main/resources/processes/clone-config-async.bpmn) to camunda cloud modeler
+- Start Instance (without parameters)
+- Set proper zeebe.client.cloud.clientSecret in [application.properties](src/main/resources/application.properties)
+- Run [CloneConfigAsync](src/main/java/victor/prp/cammunda/poc/async/CloneConfigAsync.java) using your IDE or maven
+
+
+## Redeem Points Sync
+Demonstrates synchronous SAGA with compensation operations. <p>
+![redeem points flow](redeem-points-sync.png)
+In this scenario a customer redeems his points and gets corresponding reward.
+The given rewardId should be returned if the flow succeeded (should be implemented asynchronously)
+The operation is exposed via REST end point: POST /redeem-points. <p>
+It also shows how reactive programming can be used with Camunda via ZeebeClient.
+
+NOTES:
+- In the real world scenario the REST response should provide a reference to redemption entity (URL) so the client can poll its state
+- In order to optimize client side websocket can be used (in this case we should consider impl camunda process exporter)
+
+How to run:
+- Deploy the [redeem-points-sync.bpmn](src/main/resources/processes/redeem-points-sync.bpmn) to camunda cloud modeler
+- Start Instance (without parameters)
+- Set proper zeebe.client.cloud.clientSecret in [application.properties](src/main/resources/application.properties)
+- Run [CloneConfigAsync](src/main/java/victor/prp/cammunda/poc/sync) using your IDE or maven

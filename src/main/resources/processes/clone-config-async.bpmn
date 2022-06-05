@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Web Modeler" exporterVersion="d9f6ce8" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.0.0" camunda:diagramRelationId="34b2cc18-df16-438d-a747-4d5f1dcf92c4">
-  <bpmn:process id="Process_3d0c5c07-468e-4a26-8f44-808c4f81b276" name="clone-completed" isExecutable="true">
+  <bpmn:process id="Process_3d0c5c07-468e-4a26-8f44-808c4f81b276" name="clone-config-async" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_19iadez</bpmn:outgoing>
     </bpmn:startEvent>

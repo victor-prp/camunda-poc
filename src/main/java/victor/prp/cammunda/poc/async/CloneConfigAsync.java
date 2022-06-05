@@ -14,16 +14,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @EnableZeebeClient
-public class AsyncAll {
+public class CloneConfigAsync {
     private final ZeebeClient zeebeClient;
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
 
-    public AsyncAll(ZeebeClient zeebeClient) {
+    public CloneConfigAsync(ZeebeClient zeebeClient) {
         this.zeebeClient = zeebeClient;
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(AsyncAll.class, args);
+        SpringApplication.run(CloneConfigAsync.class, args);
     }
 
     @ZeebeWorker(type = "async-clone-config", autoComplete = true)
