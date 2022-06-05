@@ -70,8 +70,8 @@ public class RedeemPointsSync {
 
 
         boolean fail = job.getVariablesAsMap().containsKey("fail-rewards");
-        zeebe.doAsyncWithVars(job, simulateRestCallToCreateRewards(fail)
-        );
+        zeebe.doAsyncWithVars(job,
+            simulateRestCallToCreateRewards(fail)); //Asynchronous invocation using reactive programming
         log.info("Starting: create-reward" + job.getVariables());
 
     }
